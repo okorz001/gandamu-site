@@ -32,8 +32,7 @@ function createApiRouter() {
 }
 
 async function mongoMiddleware(req, res, next) {
-    const data = await readFile(DB_CREDS_PATH)
-    const {url, user, password} = JSON.parse(data)
+    const {url, user, password} = await getMongoCreds()
     const mongo = new MongoClient(url, {
         useNewUrlParser: true,
         auth: {user, password},
@@ -43,6 +42,20 @@ async function mongoMiddleware(req, res, next) {
     res.on('finish', () => mongo.close())
     req.mongo = mongo
     next()
+}
+
+async function getMongoCreds() {
+    try {
+        return JSON.parse(await readFile(DB_CREDS_PATH))
+
+    }
+    catch (err) {
+        return {
+            url: process.env.DB_URL,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+        }
+    }
 }
 
 async function getAppearances(req, res, next) {

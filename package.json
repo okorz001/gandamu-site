@@ -25,5 +25,9 @@
   "browserslist": [
     ">= 1% in US",
     "not ie <= 11"
-  ]
+  ],
+  "engines": {
+    "node": "^10.15.1"
+  },
+  "heroku-run-build-script": true
 }
