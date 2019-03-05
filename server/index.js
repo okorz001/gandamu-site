@@ -60,27 +60,30 @@ async function getMongoCreds() {
 }
 
 async function getAppearances(req, res, next) {
-    const db = await req.mongo.db('gundam')
-    const col = await db.collection('appearances')
-    const cur = await col.find()
-    const data = await cur.toArray()
+    const data = await req.mongo
+        .db('gundam')
+        .collection('appearances')
+        .find()
+        .toArray()
     res.json(data)
     next()
 }
 
 async function getConfig(req, res, next) {
-    const db = await req.mongo.db('gundam')
-    const col = await db.collection('config')
-    const data = await col.findOne({})
+    const data = await req.mongo
+        .db('gundam')
+        .collection('config')
+        .findOne({})
     res.json(data)
     next()
 }
 
 async function getMecha(req, res, next) {
-    const db = await req.mongo.db('gundam')
-    const col = await db.collection('mecha')
-    const cur = await col.find()
-    const data = await cur.toArray()
+    const data = await req.mongo
+        .db('gundam')
+        .collection('mecha')
+        .find()
+        .toArray()
     res.json(data)
     next()
 }
