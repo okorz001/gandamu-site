@@ -37,11 +37,17 @@ function Checkbox({checked, name, label: text, onChange}) {
     )
 }
 
-function ControlPanel({options, setOptions}) {
+function ControlPanel({options, setOptions, collapse, setCollapse}) {
     const [config, setConfig] = useState({universes: [], series: []})
     const [includeManga, setIncludeManga] = useState(false)
 
     useFetchJsonOnce('/api/getConfig', setConfig)
+
+    const collapseOnChange = (name, value) => setCollapse(value)
+    const collapseBox = <Checkbox checked={collapse}
+                                  name="collapse"
+                                  label="Collapse Variants"
+                                  onChange={collapseOnChange} />
 
     const mangaOnChange = (name, value) => {
         setIncludeManga(value)
@@ -104,6 +110,7 @@ function ControlPanel({options, setOptions}) {
     return (
         <div>
             <Fieldset id="filters" legend="Filters">
+                {collapseBox}
                 {mangaBox}
                 <Fieldset id="universes" legend="Universes">{universeBoxes}</Fieldset>
                 <Fieldset id="series" legend="Series">{seriesBoxes}</Fieldset>
@@ -115,15 +122,23 @@ function ControlPanel({options, setOptions}) {
 function App() {
     const headers = ["Mecha", "Appearances"]
 
-    const [data, setData] = useState([])
     const [options, setOptions] = useState({})
+    const [collapse, setCollapse] = useState(false)
+
+    const [data, setData] = useState([])
+    const [collapsedData, setCollapsedData] = useState([])
 
     useFetchJsonOnce('/api/getAppearances', setData)
+    useFetchJsonOnce('/api/getAppearances?collapsed=1', setCollapsedData)
 
     return (
         <div>
-            <ControlPanel options={options} setOptions={setOptions} />
-            <Table headers={headers} rows={getRows(options, data)} />
+            <ControlPanel options={options}
+                          setOptions={setOptions}
+                          collapse={collapse}
+                          setCollapse={setCollapse} />
+            <Table headers={headers}
+                   rows={getRows(options, collapse ? collapsedData : data)} />
         </div>
     )
 }

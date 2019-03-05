@@ -60,11 +60,42 @@ async function getMongoCreds() {
 }
 
 async function getAppearances(req, res, next) {
-    const data = await req.mongo
+    let data = await req.mongo
         .db('gundam')
         .collection('appearances')
         .find()
         .toArray()
+
+    if (req.query.collapsed == '1') {
+        const mecha = {}
+        await req.mongo
+            .db('gundam')
+            .collection('mecha')
+            .find()
+            .forEach(it => mecha[it.name] = it)
+
+        data = data.map(({series, appearances}) => {
+            const collapsed = {}
+            appearances.forEach(({name, episodes}) => {
+                // use variant name, fall back to own name
+                let key = name
+                if (mecha[name] && mecha[name].variant) {
+                    key = mecha[name].variant
+                }
+                // initialize if unset
+                if (!collapsed[key]) {
+                    collapsed[key] = {name: key, episodes: {}}
+                }
+                // merge episode sets
+                Object.assign(collapsed[key].episodes, episodes)
+                // update total count
+                collapsed[key].total = Object.keys(collapsed[key].episodes).length
+            })
+            // strip key
+            return {series, appearances: Object.values(collapsed)}
+        })
+    }
+
     res.json(data)
     next()
 }
