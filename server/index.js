@@ -28,6 +28,7 @@ function createApiRouter() {
     router.use(asyncHandler(mongoMiddleware))
     router.get('/getAppearances', asyncHandler(getAppearances))
     router.get('/getConfig', asyncHandler(getConfig))
+    router.get('/getMecha', asyncHandler(getMecha))
     return router
 }
 
@@ -71,6 +72,15 @@ async function getConfig(req, res, next) {
     const db = await req.mongo.db('gundam')
     const col = await db.collection('config')
     const data = await col.findOne({})
+    res.json(data)
+    next()
+}
+
+async function getMecha(req, res, next) {
+    const db = await req.mongo.db('gundam')
+    const col = await db.collection('mecha')
+    const cur = await col.find()
+    const data = await cur.toArray()
     res.json(data)
     next()
 }
