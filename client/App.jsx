@@ -156,6 +156,13 @@ function getRows(options, data) {
     return Object.keys(acc)
         .map(name => [name, acc[name]])
         .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        // add image
+        .map(([name, total]) => [<Mecha name={name} />, total])
+}
+
+function Mecha({name}) {
+    const url = `/api/getImage?name=${name}`
+    return <div className="mecha"><img src={url} /><span>{name}</span></div>
 }
 
 export default App

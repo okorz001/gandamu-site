@@ -28,3 +28,12 @@ th, td {
 td:nth-child(2) {
     text-align: center;
 }
+
+.mecha {
+    display: flex;
+    align-items: center;
+}
+
+.mecha img {
+    margin-right: 5px;
+}
