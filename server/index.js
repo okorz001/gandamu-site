@@ -29,6 +29,7 @@ function createApiRouter() {
     router.get('/getAppearances', asyncHandler(getAppearances))
     router.get('/getConfig', asyncHandler(getConfig))
     router.get('/getMecha', asyncHandler(getMecha))
+    router.get('/getImage', asyncHandler(getImage))
     return router
 }
 
@@ -116,6 +117,27 @@ async function getMecha(req, res, next) {
         .find()
         .toArray()
     res.json(data)
+    next()
+}
+
+async function getImage(req, res, next) {
+    if (!req.query.name) {
+        res.status(400).send('missing parameter: name')
+        next()
+        return
+    }
+    const data = await req.mongo
+        .db('gundam')
+        .collection('images')
+        .findOne({name: req.query.name})
+    if (!data) {
+        // TODO: default image
+        res.status(404).send(`no image for: ${req.query.name}`)
+        next()
+        return
+    }
+    res.set('Content-Type', 'image/jpeg')
+    res.send(data.image.buffer)
     next()
 }
 
