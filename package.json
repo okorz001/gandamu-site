@@ -28,6 +28,5 @@
   ],
   "engines": {
     "node": "^10.15.1"
-  },
-  "heroku-run-build-script": true
+  }
 }
