@@ -111,11 +111,13 @@ async function getConfig(req, res, next) {
 }
 
 async function getMecha(req, res, next) {
-    const data = await req.mongo
+    const data = {}
+    await req.mongo
         .db('gundam')
         .collection('mecha')
         .find()
-        .toArray()
+        // index by name
+        .forEach(it => data[it.name] = it)
     res.json(data)
     next()
 }

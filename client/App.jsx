@@ -127,9 +127,12 @@ function App() {
 
     const [data, setData] = useState([])
     const [collapsedData, setCollapsedData] = useState([])
+    const [mecha, setMecha] = useState([])
 
     useFetchJsonOnce('/api/getAppearances', setData)
+    // TODO: we could compute this now with getMecha results
     useFetchJsonOnce('/api/getAppearances?collapsed=1', setCollapsedData)
+    useFetchJsonOnce('/api/getMecha', setMecha)
 
     return (
         <div>
@@ -138,12 +141,12 @@ function App() {
                           collapse={collapse}
                           setCollapse={setCollapse} />
             <Table headers={headers}
-                   rows={getRows(options, collapse ? collapsedData : data)} />
+                   rows={getRows(options, collapse ? collapsedData : data, mecha)} />
         </div>
     )
 }
 
-function getRows(options, data) {
+function getRows(options, data, mecha) {
     // accumulate across series
     const acc = {}
     data.filter(({series}) => options[series])
@@ -157,12 +160,18 @@ function getRows(options, data) {
         .map(name => [name, acc[name]])
         .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
         // add image
-        .map(([name, total]) => [<Mecha name={name} />, total])
+        .map(([name, total]) => [
+            <Mecha name={name} hasImage={mecha[name] ? mecha[name].hasImage : false} />,
+            total,
+        ])
 }
 
-function Mecha({name}) {
-    const url = `/api/getImage?name=${name}`
-    return <div className="mecha"><img src={url} /><span>{name}</span></div>
+function Mecha({name, hasImage}) {
+    let image = null
+    if (hasImage) {
+        image = <img src={`/api/getImage?name=${name}`} />
+    }
+    return <div className="mecha">{image}<span>{name}</span></div>
 }
 
 export default App
